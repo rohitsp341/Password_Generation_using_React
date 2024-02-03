@@ -17,7 +17,57 @@ function App() {
   }
 
 
+  const generatePass = useCallback(() => {
+    let pass="";
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let num = "0123456789";
+    let char = "!@#$%^&*()_+";
+    if(!numberAllower && !charAllowed) {
+      for(let i=1; i<length; i++){
+        const charIndex=Math.floor(Math.random()*str.length+1);  
+        pass+=str.charAt(charIndex);
+      }
+    }
+    else if(numberAllower && !charAllowed) {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 4) {
+          pass+=num.charAt(Math.floor(Math.random()*num.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+    else if(charAllowed && !numberAllower) {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 4) {
+          pass+=char.charAt(Math.floor(Math.random()*char.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+    else {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 2) {
+          pass+=num.charAt(Math.floor(Math.random()*num.length+1))
+        }
+        else if(chance > 2 && chance < 5) {
+          pass+=char.charAt(Math.floor(Math.random()*char.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+setPassword(pass);
+  }, [length, numberAllower, charAllowed]);
 
+/*
   const generatePassword=useCallback(()=>{
     let pass="";
     let str="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -35,10 +85,10 @@ function App() {
   },[length,numberAllower,charAllowed]); // so as long as these dependencies dont change
 
 
-
+*/
 
   useEffect(()=>{
-    generatePassword();
+    generatePass();
   }, [length, numberAllower, charAllowed]);
   
 
@@ -53,13 +103,15 @@ function App() {
 
   // to generate new Password
   const NewPassword=()=>{
-    generatePassword();
+    generatePass();
 
   }
 
 
    const Reset=()=>{
      setLength(8);
+     document.getElementById("numberAllowerCheckbox").checked = false; //deselects the checkbox
+     document.getElementById("charAllowerCheckbox").checked = false;
      setNumberAllower('');
      setCharAllowed('');
      setPassword('');
@@ -88,12 +140,12 @@ function App() {
             <label htmlFor="length">Length :{length}</label>
           </div>
           <div className="flex items-center gap-x-1">
-            <input type="checkbox" name="" id="" defaultValue={numberAllower} onChange={()=>{setNumberAllower((prev)=>!prev)}} />
+            <input type="checkbox" name="" id="numberAllowerCheckbox" defaultValue={numberAllower} onChange={()=>{setNumberAllower((prev)=>!prev)}} />
             <label htmlFor="number">Number</label>
           </div>
 
           <div className="flex items-center gap-x-1">
-            <input type="checkbox" name="" id="" defaultValue={charAllowed} onChange={()=>{setCharAllowed((prev)=>!prev)}} />
+            <input type="checkbox" name="" id="charAllowerCheckbox" defaultValue={charAllowed} onChange={()=>{setCharAllowed((prev)=>!prev)}} />
             <label htmlFor="charInput">Character</label>
           </div>
 
