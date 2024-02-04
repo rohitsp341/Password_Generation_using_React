@@ -1,14 +1,11 @@
 import { useState , useCallback ,useEffect , useRef} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
 
 function App() {
-  const [Length,setLength] = useState(8);
-  const [NumberAllower,setNumberAllower]=useState(false); //numbers checkbox
-  const [CharAllowed,setCharAllowed]=useState(false);   // character checkbox
-  const [password,setpassword]=useState('');  //password data displayed in input box
+  const [length,setLength] = useState(8);
+  const [numberAllower,setNumberAllower]=useState(false); //numbers checkbox
+  const [charAllowed,setCharAllowed]=useState(false);   // character checkbox
+  const [password,setPassword]=useState('');  //password data displayed in input box
 
 
 
@@ -20,29 +17,79 @@ function App() {
   }
 
 
+  const generatePass = useCallback(() => {
+    let pass="";
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let num = "0123456789";
+    let char = "!@#$%^&*()_+";
+    if(!numberAllower && !charAllowed) {
+      for(let i=1; i<length; i++){
+        const charIndex=Math.floor(Math.random()*str.length+1);  
+        pass+=str.charAt(charIndex);
+      }
+    }
+    else if(numberAllower && !charAllowed) {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 4) {
+          pass+=num.charAt(Math.floor(Math.random()*num.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+    else if(charAllowed && !numberAllower) {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 4) {
+          pass+=char.charAt(Math.floor(Math.random()*char.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+    else {
+      for(let i=1; i<length; i++) {
+        const chance = Math.floor(Math.random()*9+1)
+        if(chance < 2) {
+          pass+=num.charAt(Math.floor(Math.random()*num.length+1))
+        }
+        else if(chance > 2 && chance < 5) {
+          pass+=char.charAt(Math.floor(Math.random()*char.length+1))
+        }
+        else {
+          pass+=str.charAt(Math.floor(Math.random()*str.length+1))
+        }
+      }
+    }
+setPassword(pass);
+  }, [length, numberAllower, charAllowed]);
 
+/*
   const generatePassword=useCallback(()=>{
     let pass="";
     let str="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    if(NumberAllower) str+="0123456789";
+    if(numberAllower) str+="0123456789";
     
-    if(CharAllowed) str+="!@#$%^&*()_+";  
+    if(charAllowed) str+="!@#$%^&*()_+";  
     
-    for(let i=1; i<Length; i++){
+    for(let i=1; i<length; i++){
       const charIndex=Math.floor(Math.random()*str.length+1);   // if i dont want number from 0 to ultimate number so we are adding +1 , it starts from  1 to 255
       pass+=str.charAt(charIndex);
 
     }
-    setpassword(pass)
+    setPassword(pass)
 
-  },[Length,NumberAllower,CharAllowed]); // so as long as these dependencies dont change
+  },[length,numberAllower,charAllowed]); // so as long as these dependencies dont change
 
 
-
+*/
 
   useEffect(()=>{
-    generatePassword();
-  }, [Length, NumberAllower, CharAllowed]);
+    generatePass();
+  }, [length, numberAllower, charAllowed]);
   
 
 
@@ -56,18 +103,20 @@ function App() {
 
   // to generate new Password
   const NewPassword=()=>{
-    generatePassword();
+    generatePass();
 
   }
 
 
-  // const Reset=()=>{
-  //   setLength(8);
-  //   setNumberAllower('');
-  //   setCharAllowed('');
-  //   setpassword('');
+   const Reset=()=>{
+     setLength(8);
+     document.getElementById("numberAllowerCheckbox").checked = false; //deselects the checkbox
+     document.getElementById("charAllowerCheckbox").checked = false;
+     setNumberAllower('');
+     setCharAllowed('');
+     setPassword('');
 
-  // }
+   }
 
   
 
@@ -87,16 +136,16 @@ function App() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex text-sm gap-x-2">
           <div className="flex items-center gap-x-1">
-            <input type="range" name="" min={6} max={100} value={Length} onChange={ChangeValue} className="cursor-pointer" ></input>
-            <label htmlFor="length">Length :{Length}</label>
+            <input type="range" name="" min={6} max={100} value={length} onChange={ChangeValue} className="cursor-pointer" ></input>
+            <label htmlFor="length">Length :{length}</label>
           </div>
           <div className="flex items-center gap-x-1">
-            <input type="checkbox" name="" id="" defaultValue={NumberAllower} onChange={()=>{setNumberAllower((prev)=>!prev)}} />
+            <input type="checkbox" name="" id="numberAllowerCheckbox" defaultValue={numberAllower} onChange={()=>{setNumberAllower((prev)=>!prev)}} />
             <label htmlFor="number">Number</label>
           </div>
 
           <div className="flex items-center gap-x-1">
-            <input type="checkbox" name="" id="" defaultValue={CharAllowed} onChange={()=>{setCharAllowed((prev)=>!prev)}} />
+            <input type="checkbox" name="" id="charAllowerCheckbox" defaultValue={charAllowed} onChange={()=>{setCharAllowed((prev)=>!prev)}} />
             <label htmlFor="charInput">Character</label>
           </div>
 
@@ -107,7 +156,7 @@ function App() {
       <div className="flex items-center justify-start mb-2">
 
           <button onClick={NewPassword} className="outline-none bg-green-800 text-white px-3 m-2 py-0.5 shrink-0">New</button>
-          {/* <button onClick={Reset} className="outline-none bg-red-800 text-white px-3 m-2 py-0.5 shrink-0">Reset</button> */}
+           <button onClick={Reset} className="outline-none bg-red-800 text-white px-3 m-2 py-0.5 shrink-0">Reset</button> 
           
       </div>
 
